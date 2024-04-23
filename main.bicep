@@ -24,6 +24,12 @@ param hyperv_data_collection_rule_name string = 'CodicePlastico-Monitoring-Hyper
 @description('Specifies eventhub namespace name')
 param alert_event_hub_namespace_name string
 
+@description('Specifies communication service name.')
+param communication_service_name string 
+
+@description('Specifies email communication service name.')
+param email_service_name string 
+
 var common_tags = {
   environment: 'infrastructure'
   owner: 'codiceplastico'
@@ -85,6 +91,16 @@ module alert_rules './modules/alert_rules.bicep' = {
     alert_event_hub_namespace_name: alert_event_hub_namespace_name
     monitoring_workspace_id: infrastructure.outputs.monitoring_workspace_id
     dpm_workspace_id: infrastructure.outputs.dpm_workspace_id
+    common_tags: common_tags
+  }
+}
+
+module alert_dispatcher './modules/alert_dispatcher.bicep' = {
+  name: 'alert_dispatcher'
+  scope: this
+  params: {
+    communication_service_name: communication_service_name
+    email_service_name: email_service_name
     common_tags: common_tags
   }
 }
