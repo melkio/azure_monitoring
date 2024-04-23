@@ -1,6 +1,16 @@
+@description('Specifies the location for resources.')
 param location string 
+
+@description('Specifies event hub namespace name for alerts')
 param alert_event_hub_namespace_name string
+
+@description('Specifies the workspace id for heartbeat, disks space and hyperv alerts')
+param monitoring_workspace_id string
+
+@description('Specifies the workspace id for dpm alerts')
 param dpm_workspace_id string
+
+@description('Specifies common tags for all resources')
 param common_tags object
 
 resource alert_event_hub_namespace 'Microsoft.EventHub/namespaces@2021-06-01-preview' = {
@@ -29,7 +39,7 @@ resource alert_event_hub 'Microsoft.EventHub/namespaces/eventhubs@2021-06-01-pre
 var action_groups_name = 'support'
 resource support_action_group 'microsoft.insights/actionGroups@2023-01-01' = {
   name: action_groups_name
-  location: location
+  location: 'global'
   properties: {
     enabled: true
     groupShortName: action_groups_name
@@ -41,6 +51,48 @@ resource support_action_group 'microsoft.insights/actionGroups@2023-01-01' = {
     }]
   }
   tags: common_tags
+}
+
+var heartbeat_alert_name = 'missing_heartbeat_alert'
+resource heartbeat_alert 'microsoft.insights/scheduledqueryrules@2023-03-15-preview' = {
+  name: heartbeat_alert_name
+  location: location
+  tags: common_tags
+  properties: {
+    displayName: heartbeat_alert_name
+    description: 'Alert (critical) if at least a heartbeat is missing for more than 5 minutes'
+    severity: 0
+    enabled: false
+    evaluationFrequency: 'PT5M'
+    scopes: [monitoring_workspace_id]
+    targetResourceTypes: ['Microsoft.OperationalInsights/workspaces']
+    windowSize: 'P2D'
+    overrideQueryTimeRange: 'P2D'
+    criteria: {
+      allOf: [
+        {
+          query: '''Heartbeat
+          | summarize arg_max(TimeGenerated, *) by Computer
+          | where now() - TimeGenerated > 5m
+          | project TimeGenerated, Computer'''
+          timeAggregation: 'Count'
+          dimensions: []
+          operator: 'GreaterThan'
+          threshold: 0
+          failingPeriods: {
+            numberOfEvaluationPeriods: 1
+            minFailingPeriodsToAlert: 1
+          }
+        }
+      ]
+    }
+    autoMitigate: false
+    actions: {
+      actionGroups: [support_action_group.id]
+      customProperties: {}
+      actionProperties: {}
+    }
+  }
 }
 
 var dpm_alerts_name = 'dpm_unresolved_alerts'
@@ -120,114 +172,84 @@ resource dpm_alerts 'microsoft.insights/scheduledqueryrules@2023-03-15-preview' 
   tags: common_tags
 }
 
-// resource hyperv_alerts 'microsoft.insights/scheduledqueryrules@2023-03-15-preview' = {
-//   name: hyperv_alerts_name
-//   location: location
-//   tags: common_tags
-//   properties: {
-//     displayName: hyperv_alerts_name
-//     description: 'Alert (critical) if at least a windows event exists related to hyperv replication errors'
-//     severity: 0
-//     enabled: false
-//     evaluationFrequency: 'PT1H'
-//     scopes: [monitoring_workspace_id]
-//     targetResourceTypes: ['Microsoft.OperationalInsights/workspaces']
-//     windowSize: 'PT1H'
-//     criteria: {
-//       allOf: [
-//         {
-//           query: 'Event\n| where EventID in (32022, 32332, 32354, 32086, 33680, 32552, 32088, 32315)\n\n'
-//           timeAggregation: 'Count'
-//           dimensions: []
-//           operator: 'GreaterThan'
-//           threshold: 0
-//           failingPeriods: {
-//             numberOfEvaluationPeriods: 1
-//             minFailingPeriodsToAlert: 1
-//           }
-//         }
-//       ]
-//     }
-//     autoMitigate: false
-//     actions: {
-//       actionGroups: [action_group.id]
-//       customProperties: {}
-//       actionProperties: {}
-//     }
-//   }
-// }
+var hyperv_alerts_name = 'hyperv_winevents_alerts'
+resource hyperv_alerts 'microsoft.insights/scheduledqueryrules@2023-03-15-preview' = {
+  name: hyperv_alerts_name
+  location: location
+  tags: common_tags
+  properties: {
+    displayName: hyperv_alerts_name
+    description: 'Alert (critical) if at least a windows event exists related to hyperv replication errors'
+    severity: 0
+    enabled: false
+    evaluationFrequency: 'PT1H'
+    scopes: [monitoring_workspace_id]
+    targetResourceTypes: ['Microsoft.OperationalInsights/workspaces']
+    windowSize: 'PT1H'
+    criteria: {
+      allOf: [
+        {
+          query: 'Event | where EventID in (32022, 32332, 32354, 32086, 33680, 32552, 32088, 32315)'
+          timeAggregation: 'Count'
+          dimensions: []
+          operator: 'GreaterThan'
+          threshold: 0
+          failingPeriods: {
+            numberOfEvaluationPeriods: 1
+            minFailingPeriodsToAlert: 1
+          }
+        }
+      ]
+    }
+    autoMitigate: false
+    actions: {
+      actionGroups: [support_action_group.id]
+      customProperties: {}
+      actionProperties: {}
+    }
+  }
+}
 
-// resource disks_space_alert 'microsoft.insights/scheduledqueryrules@2023-03-15-preview' = {
-//   name: disks_space_alert_name
-//   location: location
-//   tags: common_tags
-//   properties: {
-//     displayName: disks_space_alert_name
-//     description: 'Alert (critical) if at least a disk has less space than expected'
-//     severity: 0
-//     enabled: false
-//     evaluationFrequency: 'P1D'
-//     scopes: [monitoring_workspace_id]
-//     targetResourceTypes: ['Microsoft.OperationalInsights/workspaces']
-//     windowSize: 'P1D'
-//     criteria: {
-//       allOf: [
-//         {
-//           query: 'Perf\n| where ObjectName == "LogicalDisk" and CounterName == "% Free Space"\n| where strlen(InstanceName) < 5 and InstanceName endswith ":"\n| summarize arg_max(TimeGenerated, *) by Computer, InstanceName\n| where CounterValue < 15\n'
-//           timeAggregation: 'Count'
-//           dimensions: []
-//           operator: 'GreaterThan'
-//           threshold: 0
-//           failingPeriods: {
-//             numberOfEvaluationPeriods: 1
-//             minFailingPeriodsToAlert: 1
-//           }
-//         }
-//       ]
-//     }
-//     autoMitigate: false
-//     actions: {
-//       actionGroups: [action_group.id]
-//       customProperties: {}
-//       actionProperties: {}
-//     }
-//   }
-// }
+var disks_space_alert_name = 'logical_disks_free_space_alert'
+resource disks_space_alert 'microsoft.insights/scheduledqueryrules@2023-03-15-preview' = {
+  name: disks_space_alert_name
+  location: location
+  tags: common_tags
+  properties: {
+    displayName: disks_space_alert_name
+    description: 'Alert (critical) if at least a disk has less space than expected'
+    severity: 0
+    enabled: false
+    evaluationFrequency: 'P1D'
+    scopes: [monitoring_workspace_id]
+    targetResourceTypes: ['Microsoft.OperationalInsights/workspaces']
+    windowSize: 'P1D'
+    criteria: {
+      allOf: [
+        {
+          query: '''Perf
+          | where ObjectName == "LogicalDisk" and CounterName == "% Free Space"
+          | where strlen(InstanceName) < 5 and InstanceName endswith ":"
+          | summarize arg_max(TimeGenerated, *) by Computer, InstanceName
+          | where CounterValue < 15'''
+          timeAggregation: 'Count'
+          dimensions: []
+          operator: 'GreaterThan'
+          threshold: 0
+          failingPeriods: {
+            numberOfEvaluationPeriods: 1
+            minFailingPeriodsToAlert: 1
+          }
+        }
+      ]
+    }
+    autoMitigate: false
+    actions: {
+      actionGroups: [support_action_group.id]
+      customProperties: {}
+      actionProperties: {}
+    }
+  }
+}
 
-// resource heartbeat_alert 'microsoft.insights/scheduledqueryrules@2023-03-15-preview' = {
-//   name: heartbeat_alert_name
-//   location: location
-//   tags: common_tags
-//   properties: {
-//     displayName: heartbeat_alert_name
-//     description: 'Alert (critical) if at least a heartbeat is missing for more than 5 minutes'
-//     severity: 0
-//     enabled: false
-//     evaluationFrequency: 'PT5M'
-//     scopes: [monitoring_workspace_id]
-//     targetResourceTypes: ['Microsoft.OperationalInsights/workspaces']
-//     windowSize: 'P2D'
-//     overrideQueryTimeRange: 'P2D'
-//     criteria: {
-//       allOf: [
-//         {
-//           query: 'Heartbeat\n| summarize arg_max(TimeGenerated, *) by Computer\n| where now() - TimeGenerated > 5m\n| project TimeGenerated, Computer\n'
-//           timeAggregation: 'Count'
-//           dimensions: []
-//           operator: 'GreaterThan'
-//           threshold: 0
-//           failingPeriods: {
-//             numberOfEvaluationPeriods: 1
-//             minFailingPeriodsToAlert: 1
-//           }
-//         }
-//       ]
-//     }
-//     autoMitigate: false
-//     actions: {
-//       actionGroups: [action_group.id]
-//       customProperties: {}
-//       actionProperties: {}
-//     }
-//   }
-// }
+

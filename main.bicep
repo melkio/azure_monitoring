@@ -83,6 +83,7 @@ module alert_rules './modules/alert_rules.bicep' = {
   params: {
     location: location
     alert_event_hub_namespace_name: alert_event_hub_namespace_name
+    monitoring_workspace_id: infrastructure.outputs.monitoring_workspace_id
     dpm_workspace_id: infrastructure.outputs.dpm_workspace_id
     common_tags: common_tags
   }
