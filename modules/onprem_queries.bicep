@@ -12,11 +12,12 @@ resource this 'Microsoft.OperationalInsights/queryPacks@2019-09-01' = {
   }
 }
 
+var query1_name = 'OnPrem: CPU utilization'
 resource query_1 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = {
   parent: this
-  name: guid(resourceGroup().id, 'OnPrem: CPU utilization')
+  name: guid(resourceGroup().id, query1_name)
   properties: {
-    displayName: '[CP] - OnPrem: CPU utilization'
+    displayName: '[CP] - ${query1_name}'
     body: '''Perf
     | where ObjectName == "Processor Information" and CounterName == "% Processor Time"
     | where InstanceName == "_Total"
@@ -30,7 +31,7 @@ resource query_1 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' =
     ) on $left.Computer == $right.Computer
     | summarize avg=avg(CounterValue) by bin(TimeGenerated, 30m), Computer
     | render timechart '''
-    description: 'OnPrem: CPU utilization'
+    description: query1_name
     related: {
       categories: [
         'monitor'
@@ -42,11 +43,12 @@ resource query_1 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' =
   }
 }
 
+var query2_name = 'OnPrem: Disk usage'
 resource query_2 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = {
   parent: this
-  name: guid(resourceGroup().id, 'OnPrem: Disk usage')
+  name: guid(resourceGroup().id, query2_name)
   properties: {
-    displayName: '[CP] - OnPrem: Disk usage'
+    displayName: '[CP] - ${query2_name}'
     body: '''Perf
     | where ObjectName == "LogicalDisk" and CounterName == "% Free Space"
     | where strlen(InstanceName) < 5 and InstanceName endswith ":"
@@ -54,7 +56,7 @@ resource query_2 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' =
     | project Status = iif(CounterValue > 50, "Healty", iif(CounterValue < 15, "Critical", "Warning"))
     | summarize count() by Status
     | render piechart'''
-    description: 'OnPrem: Disk usage'
+    description: query2_name
     related: {
       categories: [
         'monitor'
@@ -66,11 +68,12 @@ resource query_2 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' =
   }
 }
 
+var query3_name = 'OnPrem: Critical disks'
 resource query_3 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = {
   parent: this
-  name: guid(resourceGroup().id, 'OnPrem: Critical disks')
+  name: guid(resourceGroup().id, query3_name)
   properties: {
-    displayName: '[CP] - OnPrem: Disk usage - Critical disks (less than 15% free space available)'
+    displayName: '[CP] - ${query3_name}'
     body: '''Perf
     | where ObjectName == "LogicalDisk" and CounterName == "% Free Space"
     | where strlen(InstanceName) < 5 and InstanceName endswith ":"
@@ -78,7 +81,7 @@ resource query_3 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' =
     | project Status = iif(CounterValue > 50, "Healty", iif(CounterValue < 15, "Critical", "Warning"))
     | summarize count() by Status
     | render piechart'''
-    description: 'OnPrem: Disk usage - Critical disks (less than 15% free space available)'
+    description: query3_name
     related: {
       categories: [
         'monitor'

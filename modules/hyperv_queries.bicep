@@ -12,7 +12,7 @@ resource this 'Microsoft.OperationalInsights/queryPacks@2019-09-01' = {
   }
 }
 
-param query1_name string = 'HyperV: Logical Processor (% Total Run Time)'
+var query1_name = 'HyperV: Logical Processor (% Total Run Time)'
 resource query1 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = {
   parent: this
   name: guid(resourceGroup().id, query1_name)
@@ -35,7 +35,7 @@ resource query1 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = 
   }
 }
 
-param query2_name string = 'HyperV: Dynamic Memory Balancer (Average Pressure)'
+var query2_name = 'HyperV: Dynamic Memory Balancer (Average Pressure)'
 resource query2 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = {
   parent: this
   name: guid(resourceGroup().id, query2_name)
@@ -57,7 +57,7 @@ resource query2 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = 
   }
 }
 
-param query3_name string = 'HyperV: Virtual Processor (% Total Run Time Graph)'
+var query3_name = 'HyperV: Virtual Processor (% Total Run Time Graph)'
 resource query3 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = {
   parent: this
   name: guid(resourceGroup().id, query3_name)
@@ -95,7 +95,7 @@ resource query3 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = 
   }
 }
 
-param query4_name string = 'Hyper-V: Virtual Processor (% Total Run Time List)'
+var query4_name = 'Hyper-V: Virtual Processor (% Total Run Time List)'
 resource query4 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = {
   parent: this
   name: guid(resourceGroup().id, query4_name)
@@ -129,7 +129,7 @@ resource query4 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = 
   }
 }
 
-param query5_name string = 'Hyper-V: Dynamic Memory VM (Average Pressure Graph)'
+var query5_name = 'Hyper-V: Dynamic Memory VM (Average Pressure Graph)'
 resource query5 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = {
   parent: this
   name: guid(resourceGroup().id, query5_name)
@@ -157,7 +157,7 @@ resource query5 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = 
   }
 }
 
-param query6_name string = 'Hyper-V: Dynamic Memory VM (Average Pressure List)'
+var query6_name = 'Hyper-V: Dynamic Memory VM (Average Pressure List)'
 resource query6 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = {
   parent: this
   name: guid(resourceGroup().id, query6_name)
@@ -185,7 +185,7 @@ resource query6 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = 
   }
 }
 
-param query7_name string = 'Hyper-V: Event errors (Aggregated graph)'
+var query7_name = 'Hyper-V: Event errors (Aggregated graph)'
 resource query7 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = {
   parent: this
   name: guid(resourceGroup().id, query7_name)
@@ -208,7 +208,7 @@ resource query7 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = 
   }
 }
 
-param query8_name string = 'Hyper-V: Event errors (List)'
+var query8_name = 'Hyper-V: Event errors (List)'
 resource query8 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = {
   parent: this
   name: guid(resourceGroup().id, query8_name)
