@@ -12,7 +12,7 @@ var europe_data_location = 'Europe'
 resource email_service 'Microsoft.Communication/emailServices@2023-06-01-preview' = {
   name: email_service_name
   location: 'global'
-  tags: union(common_tags, { context: 'monitoring' })
+  tags: union(common_tags, { context: 'alert' })
   properties: {
     dataLocation: europe_data_location
   }
@@ -22,7 +22,7 @@ resource email_domain 'Microsoft.Communication/emailServices/domains@2023-06-01-
   parent: email_service
   name: 'AzureManagedDomain'
   location: 'global'
-  tags: union(common_tags, { context: 'monitoring' })
+  tags: union(common_tags, { context: 'alert' })
   properties: {
     domainManagement: 'AzureManaged'
     userEngagementTracking: 'Disabled'
@@ -32,7 +32,7 @@ resource email_domain 'Microsoft.Communication/emailServices/domains@2023-06-01-
 resource communication_service 'Microsoft.Communication/CommunicationServices@2023-06-01-preview' = {
   name: communication_service_name
   location: 'global'
-  tags: union(common_tags, { context: 'monitoring' })
+  tags: union(common_tags, { context: 'alert' })
   properties: {
     dataLocation: europe_data_location
     linkedDomains: [email_domain.id]
