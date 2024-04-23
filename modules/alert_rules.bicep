@@ -57,12 +57,11 @@ var heartbeat_alert_name = 'missing_heartbeat_alert'
 resource heartbeat_alert 'microsoft.insights/scheduledqueryrules@2023-03-15-preview' = {
   name: heartbeat_alert_name
   location: location
-  tags: common_tags
   properties: {
+    enabled: true
     displayName: heartbeat_alert_name
     description: 'Alert (critical) if at least a heartbeat is missing for more than 5 minutes'
     severity: 0
-    enabled: false
     evaluationFrequency: 'PT5M'
     scopes: [monitoring_workspace_id]
     targetResourceTypes: ['Microsoft.OperationalInsights/workspaces']
@@ -89,10 +88,9 @@ resource heartbeat_alert 'microsoft.insights/scheduledqueryrules@2023-03-15-prev
     autoMitigate: false
     actions: {
       actionGroups: [support_action_group.id]
-      customProperties: {}
-      actionProperties: {}
     }
   }
+  tags: common_tags
 }
 
 var dpm_alerts_name = 'dpm_unresolved_alerts'
@@ -100,10 +98,10 @@ resource dpm_alerts 'microsoft.insights/scheduledqueryrules@2023-03-15-preview' 
   name: dpm_alerts_name
   location: location
   properties: {
+    enabled: true
     displayName: dpm_alerts_name
     description: 'Alert (critical) if at least a dpm alert is unresolved'
     severity: 0
-    enabled: false
     evaluationFrequency: 'P1D'
     scopes: [dpm_workspace_id]
     targetResourceTypes: ['Microsoft.OperationalInsights/workspaces']
@@ -165,8 +163,6 @@ resource dpm_alerts 'microsoft.insights/scheduledqueryrules@2023-03-15-preview' 
     autoMitigate: false
     actions: {
       actionGroups: [support_action_group.id]
-      customProperties: {}
-      actionProperties: {}
     }
   }
   tags: common_tags
@@ -176,12 +172,11 @@ var hyperv_alerts_name = 'hyperv_winevents_alerts'
 resource hyperv_alerts 'microsoft.insights/scheduledqueryrules@2023-03-15-preview' = {
   name: hyperv_alerts_name
   location: location
-  tags: common_tags
   properties: {
     displayName: hyperv_alerts_name
     description: 'Alert (critical) if at least a windows event exists related to hyperv replication errors'
     severity: 0
-    enabled: false
+    enabled: true
     evaluationFrequency: 'PT1H'
     scopes: [monitoring_workspace_id]
     targetResourceTypes: ['Microsoft.OperationalInsights/workspaces']
@@ -204,22 +199,20 @@ resource hyperv_alerts 'microsoft.insights/scheduledqueryrules@2023-03-15-previe
     autoMitigate: false
     actions: {
       actionGroups: [support_action_group.id]
-      customProperties: {}
-      actionProperties: {}
     }
   }
+  tags: common_tags
 }
 
 var disks_space_alert_name = 'logical_disks_free_space_alert'
 resource disks_space_alert 'microsoft.insights/scheduledqueryrules@2023-03-15-preview' = {
   name: disks_space_alert_name
   location: location
-  tags: common_tags
   properties: {
+    enabled: true
     displayName: disks_space_alert_name
     description: 'Alert (critical) if at least a disk has less space than expected'
     severity: 0
-    enabled: false
     evaluationFrequency: 'P1D'
     scopes: [monitoring_workspace_id]
     targetResourceTypes: ['Microsoft.OperationalInsights/workspaces']
@@ -246,10 +239,9 @@ resource disks_space_alert 'microsoft.insights/scheduledqueryrules@2023-03-15-pr
     autoMitigate: false
     actions: {
       actionGroups: [support_action_group.id]
-      customProperties: {}
-      actionProperties: {}
     }
   }
+  tags: common_tags
 }
 
 
