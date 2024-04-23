@@ -21,6 +21,9 @@ param common_data_collection_rule_name string = 'CodicePlastico-Monitoring-Commo
 @description('Specifies hyperv data collection rule name')
 param hyperv_data_collection_rule_name string = 'CodicePlastico-Monitoring-HyperV'
 
+@description('Specifies eventhub namespace name')
+param alert_event_hub_namespace_name string
+
 var common_tags = {
   environment: 'infrastructure'
   owner: 'codiceplastico'
@@ -70,6 +73,17 @@ module hyperv_queries './modules/hyperv_queries.bicep' = {
   scope: this
   params: {
     location: location
+    common_tags: common_tags
+  }
+}
+
+module alert_rules './modules/alert_rules.bicep' = {
+  name: 'alert_rules'
+  scope: this
+  params: {
+    location: location
+    alert_event_hub_namespace_name: alert_event_hub_namespace_name
+    dpm_workspace_id: infrastructure.outputs.dpm_workspace_id
     common_tags: common_tags
   }
 }
