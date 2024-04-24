@@ -48,6 +48,7 @@ resource support_action_group 'microsoft.insights/actionGroups@2023-01-01' = {
       eventHubNameSpace: alert_event_hub_namespace.name
       eventHubName: alert_event_hub.name
       subscriptionId: subscription().subscriptionId
+      useCommonAlertSchema: true
     }]
   }
   tags: union(common_tags, { context: 'alert' })
