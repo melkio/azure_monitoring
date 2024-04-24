@@ -24,7 +24,7 @@ resource alert_event_hub_namespace 'Microsoft.EventHub/namespaces@2021-06-01-pre
   properties: {
     zoneRedundant: false
   }
-  tags: common_tags
+  tags: union(common_tags, { context: 'alert' })
 }
 
 resource alert_event_hub 'Microsoft.EventHub/namespaces/eventhubs@2021-06-01-preview' = {
@@ -50,7 +50,7 @@ resource support_action_group 'microsoft.insights/actionGroups@2023-01-01' = {
       subscriptionId: subscription().subscriptionId
     }]
   }
-  tags: common_tags
+  tags: union(common_tags, { context: 'alert' })
 }
 
 var heartbeat_alert_name = 'missing_heartbeat_alert'
@@ -90,7 +90,7 @@ resource heartbeat_alert 'microsoft.insights/scheduledqueryrules@2023-03-15-prev
       actionGroups: [support_action_group.id]
     }
   }
-  tags: common_tags
+  tags: union(common_tags, { context: 'alert' })
 }
 
 var dpm_alerts_name = 'dpm_unresolved_alerts'
@@ -165,7 +165,7 @@ resource dpm_alerts 'microsoft.insights/scheduledqueryrules@2023-03-15-preview' 
       actionGroups: [support_action_group.id]
     }
   }
-  tags: common_tags
+  tags: union(common_tags, { context: 'alert' })
 }
 
 var hyperv_alerts_name = 'hyperv_winevents_alerts'
@@ -201,7 +201,7 @@ resource hyperv_alerts 'microsoft.insights/scheduledqueryrules@2023-03-15-previe
       actionGroups: [support_action_group.id]
     }
   }
-  tags: common_tags
+  tags: union(common_tags, { context: 'alert' })
 }
 
 var disks_space_alert_name = 'logical_disks_free_space_alert'
@@ -241,7 +241,7 @@ resource disks_space_alert 'microsoft.insights/scheduledqueryrules@2023-03-15-pr
       actionGroups: [support_action_group.id]
     }
   }
-  tags: common_tags
+  tags: union(common_tags, { context: 'alert' })
 }
 
 
