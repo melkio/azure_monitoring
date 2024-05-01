@@ -78,9 +78,8 @@ resource query_3 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' =
     | where ObjectName == "LogicalDisk" and CounterName == "% Free Space"
     | where strlen(InstanceName) < 5 and InstanceName endswith ":"
     | summarize arg_max(TimeGenerated, *) by Computer, InstanceName
-    | project Status = iif(CounterValue > 50, "Healty", iif(CounterValue < 15, "Critical", "Warning"))
-    | summarize count() by Status
-    | render piechart'''
+    | project Computer, Disk = InstanceName, Value = CounterValue, Status = iif(CounterValue > 50, "Healty", iif(CounterValue < 10, "Critical", "Warning"))
+    | where Status == "Critical"'''
     description: query3_name
     related: {
       categories: [

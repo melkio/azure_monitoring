@@ -18,12 +18,12 @@ resource query1 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = 
   name: guid(resourceGroup().id, query1_name)
   properties: {
     displayName: '[CP] - ${query1_name}'
-    body: '''CoreAzureBackup 
-    | where OperationName  == "BackupManagementServer" 
-    | summarize arg_max(TimeGenerated, *) by BackupManagementServerName 
-    | join kind=inner (CoreAzureBackup 
-    | where OperationName == "ProtectedContainerAssociation" 
-    | summarize arg_max(TimeGenerated, *) by ProtectedContainerUniqueId) on BackupManagementServerUniqueId 
+    body: '''CoreAzureBackup
+    | where OperationName  == "BackupManagementServer"
+    | summarize arg_max(TimeGenerated, *) by BackupManagementServerName
+    | join kind=inner (CoreAzureBackup
+    | where OperationName == "ProtectedContainerAssociation"
+    | summarize arg_max(TimeGenerated, *) by ProtectedContainerUniqueId) on BackupManagementServerUniqueId
     | summarize ProtectedServerCount=count() by Name=BackupManagementServerName, Version=AzureBackupAgentVersion,  AzureBackupAgentVersion=BackupManagementServerOSVersion'''
     description: query1_name
     related: {
@@ -43,7 +43,8 @@ resource query2 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = 
   name: guid(resourceGroup().id, query2_name)
   properties: {
     displayName: '[CP] - ${query2_name}'
-    body: '_AzureBackup_GetBackupInstances | summarize Count=countif(ProtectionInfo == "Protected") by DatasourceType'
+    body: '''_AzureBackup_GetBackupInstances 
+    | summarize Count=countif(ProtectionInfo == "Protected") by DatasourceType'''
     description: query2_name
     related: {
       categories: [
@@ -62,7 +63,9 @@ resource query3 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = 
   name: guid(resourceGroup().id, query3_name)
   properties: {
     displayName: '[CP] - ${query3_name}'
-    body: '_AzureBackup_GetBackupInstances | summarize Count=countif(ProtectionInfo == "Protected") by DatasourceType | render piechart '
+    body: '''_AzureBackup_GetBackupInstances 
+    | summarize Count=countif(ProtectionInfo == "Protected") by DatasourceType 
+    | render piechart'''
     description: query3_name
     related: {
       categories: [
@@ -148,7 +151,7 @@ resource query5 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = 
         | project BackupManagementServerUniqueId, BackupManagementServerName)
         on BackupManagementServerUniqueId
     | project BackupManagementServerName, AlertCount, AlertType
-    | render columnchart '''
+    | render columnchart'''
     description: query5_name
     related: {
       categories: [
@@ -208,7 +211,7 @@ resource query_7 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' =
         | summarize sum(Count)
         | project JobFailureCode="others", Count=sum_Count
     )
-    | render piechart '''
+    | render piechart'''
     description: query7_name
     related: {
       categories: [

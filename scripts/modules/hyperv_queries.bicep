@@ -22,7 +22,7 @@ resource query1 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = 
     | where ObjectName == "Hyper-V Hypervisor Logical Processor" and CounterName == "% Total Run Time"
     | where InstanceName == "_Total"
     | summarize avg=avg(CounterValue) by bin(TimeGenerated, 30m), Computer
-    | render timechart '''
+    | render timechart'''
     description: query1_name
     related: {
       categories: [
@@ -166,13 +166,9 @@ resource query6 'Microsoft.OperationalInsights/queryPacks/queries@2019-09-01' = 
     body: '''Perf
     | where ObjectName == "Hyper-V Dynamic Memory VM" and CounterName == "Average Pressure"
     | summarize avg=avg(CounterValue) by Computer, InstanceName
-    | project Computer, VirtualMachine=InstanceName, status=iif(avg < 80, "Healty", iif(avg < 100, "Warning", "Critical"))
-    | summarize
-        healty=countif(status == "Healty"),
-        warning=countif(status == "Warning"),
-        critical=countif(status == "Critical")
-        by Computer
-    | render columnchart'''
+    | project Computer, VirtualMachine=InstanceName, Status=iif(avg < 80, "Healty", iif(avg < 100, "Warning", "Critical"))
+    | where Status == "Warning" or Status == "Critical"
+    | order by Computer, VirtualMachine, Status'''
     description: query6_name
     related: {
       categories: [
