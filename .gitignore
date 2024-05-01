@@ -368,3 +368,4 @@ launchSettings.json
 
 # custom
 params/
+.mono/
