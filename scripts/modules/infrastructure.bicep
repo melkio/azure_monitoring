@@ -195,9 +195,9 @@ resource hyperv_data_collection_rule 'Microsoft.Insights/dataCollectionRules@202
   tags: common_tags
 }
 
-output monitoring_workspace_id string = monitoring_workspace.id
-output dpm_workspace_id string = dpm_workspace.id
-output defender_workspace_id string = defender_workspace.id
+output monitoring_workspace_id string = monitoring_workspace.properties.customerId
+output dpm_workspace_id string = dpm_workspace.properties.customerId
+output defender_workspace_id string = defender_workspace.properties.customerId
 
 // resource iis_data_collection_rule 'Microsoft.Insights/dataCollectionRules@2022-06-01' = {
 //   name: iis_data_collection_rule_name
