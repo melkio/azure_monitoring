@@ -24,11 +24,28 @@ param hyperv_data_collection_rule_name string = 'CodicePlastico-Monitoring-Hyper
 @description('Specifies eventhub namespace name')
 param alert_event_hub_namespace_name string
 
+@description('Specifies app managed environment name.')
+param app_environment_name string
+
 @description('Specifies communication service name.')
 param communication_service_name string 
 
 @description('Specifies email communication service name.')
 param email_service_name string 
+
+@description('Specifies log analytics reader service principal client id.')
+param log_analytics_reader_client_id string
+
+@secure()
+@description('Specifies log analytics reader service principal client secret.')
+param log_analytics_reader_client_secret string
+
+@description('Specifies alert dispatcher app version.')
+param alert_dispather_app_version string
+
+@description('Specifies alert recipient email.')
+param alert_recipient_email string
+
 
 var common_tags = {
   environment: 'infrastructure'
@@ -99,8 +116,17 @@ module alert_dispatcher './modules/alert_dispatcher.bicep' = {
   name: 'alert_dispatcher'
   scope: this
   params: {
+    location: location
+    monitoring_workspace_id: infrastructure.outputs.monitoring_workspace_id
+    dpm_workspace_id: infrastructure.outputs.dpm_workspace_id
+    log_analytics_reader_client_id: log_analytics_reader_client_id
+    log_analytics_reader_client_secret: log_analytics_reader_client_secret
+    app_environment_name: app_environment_name
     communication_service_name: communication_service_name
     email_service_name: email_service_name
+    alert_dispather_app_version: alert_dispather_app_version
+    alert_recipient_email: alert_recipient_email
     common_tags: common_tags
   }
 }
+
