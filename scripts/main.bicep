@@ -40,6 +40,9 @@ param log_analytics_reader_client_id string
 @description('Specifies log analytics reader service principal client secret.')
 param log_analytics_reader_client_secret string
 
+@description('Specifies the app workspace name.')
+param app_workspace_name string 
+
 @description('Specifies alert dispatcher app version.')
 param alert_dispather_app_version string
 
@@ -122,6 +125,7 @@ module alert_dispatcher './modules/alert_dispatcher.bicep' = {
     log_analytics_reader_client_id: log_analytics_reader_client_id
     log_analytics_reader_client_secret: log_analytics_reader_client_secret
     app_environment_name: app_environment_name
+    app_workspace_name: app_workspace_name
     communication_service_name: communication_service_name
     email_service_name: email_service_name
     alert_dispather_app_version: alert_dispather_app_version

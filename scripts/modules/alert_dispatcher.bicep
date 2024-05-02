@@ -1,6 +1,9 @@
 @description('Specifies the location for resources.')
 param location string 
 
+@description('Specifies the app workspace name.')
+param app_workspace_name string 
+
 @description('Specifies monitoring workspace id.')
 param monitoring_workspace_id string
 
@@ -73,6 +76,26 @@ resource email_sender 'Microsoft.Communication/emailServices/domains/senderusern
   }
 }
 
+resource app_workspace 'Microsoft.OperationalInsights/workspaces@2021-12-01-preview' = {
+  name: app_workspace_name
+  location: location
+  properties: {
+    sku: {
+      name: 'pergb2018'
+    }
+    retentionInDays: 30
+    features: {
+      enableLogAccessUsingOnlyResourcePermissions: true
+    }
+    workspaceCapping: {
+      dailyQuotaGb: -1
+    }
+    publicNetworkAccessForIngestion: 'Enabled'
+    publicNetworkAccessForQuery: 'Enabled'
+  }
+  tags: union(common_tags, { context: 'alert' })
+}
+
 resource managed_environment 'Microsoft.App/managedEnvironments@2023-11-02-preview' = {
   name: app_environment_name
   location: location
@@ -80,7 +103,7 @@ resource managed_environment 'Microsoft.App/managedEnvironments@2023-11-02-previ
     appLogsConfiguration: {
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
-        customerId: monitoring_workspace_id
+        customerId: app_workspace.properties.customerId
         dynamicJsonColumns: false
       }
     }
