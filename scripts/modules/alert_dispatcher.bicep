@@ -104,10 +104,12 @@ resource managed_environment 'Microsoft.App/managedEnvironments@2023-11-02-previ
       destination: 'log-analytics'
       logAnalyticsConfiguration: {
         customerId: app_workspace.properties.customerId
+        sharedKey: app_workspace.listKeys().primarySharedKey
         dynamicJsonColumns: false
       }
     }
     zoneRedundant: false
+    
   }
   tags: union(common_tags, { context: 'alert' })
 }
